@@ -1,0 +1,12 @@
+---
+partitions:
+  - number: 1
+    start: '0%'
+    end: '40%'
+    fstype: xfs
+    path: /part1
+  - number: 2
+    start: '40%'
+    end: '100%'
+    fstype: ext4
+    path: /part2

@@ -1,0 +1,33 @@
+- name: Install and configure Apache web server
+  package:
+    name: "{{ apache_service_name }}"
+    state: latest
+
+- name: Create files on the automation server
+  copy:
+    content: "{{ inventory_hostname }}"
+    dest: "/tmp/vm{{ ansible_play_hosts.index(inventory_hostname) + 1 }}.html"
+  delegate_to: localhost
+  become: false
+
+- name: Copy the files to respective managed nodes
+  block:
+    - name: Copy the index file to the first node
+      copy:
+        src: "/tmp/vm{{ ansible_play_hosts.index(inventory_hostname) + 1 }}.html"
+        dest: "{{ web_root_dir }}/index.html"
+        mode: 0444
+      when: inventory_hostname == ansible_play_hosts[0]
+    - name: Copy the index file to the remaining nodes
+      copy:
+        src: "/tmp/vm{{ ansible_play_hosts.index(inventory_hostname) + 1 }}.html"
+        dest: "{{ web_root_dir }}/index.html"
+        mode: 0444
+      when: inventory_hostname != ansible_play_hosts[0]
+
+- name: Start the Apache web server
+  service:
+    name: "{{ apache_service_name }}"
+    state: started
+    enabled: yes
+  notify: restart apache

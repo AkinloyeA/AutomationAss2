@@ -1,0 +1,4 @@
+---
+# ssh key variables
+user_ssh_key_file: ~/.ssh/id_rsa
+

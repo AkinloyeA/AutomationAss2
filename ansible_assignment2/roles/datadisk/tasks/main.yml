@@ -1,0 +1,32 @@
+---
+- name: Configure data disk
+  ansible.builtin.package:
+    name:
+      - parted
+      - xfsprogs
+      - e2fsprogs
+    state: present
+
+- name: Partition the data disk
+  parted:
+    device: /dev/sdc
+    number: "{{ item.number }}"
+    state: present
+    label: gpt
+    part_start: "{{ item.start }}"
+    part_end: "{{ item.end }}"
+  loop: "{{ partitions }}"
+
+- name: Create filesystem on partitions
+  filesystem:
+    fstype: "{{ item.fstype }}"
+    dev: "/dev/sdc{{ item.number }}"
+  loop: "{{ partitions }}"
+
+- name: Mount partitions
+  mount:
+    path: "{{ item.path }}"
+    src: "/dev/sdc{{ item.number }}"
+    fstype: "{{ item.fstype }}"
+    state: mounted
+  loop: "{{ partitions }}"

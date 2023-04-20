@@ -1,0 +1,11 @@
+- name: groupX-playbook
+  hosts: all
+  become: true
+  vars:
+    ansible_user: Akinloye-N01525374
+
+  roles:
+    - datadisk
+    - system_profile
+    - users
+    - webserver
